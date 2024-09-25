@@ -7,7 +7,7 @@ public class PlayerInputService : MonoBehaviour, PlayerInput.IPlayerMotionMapAct
 {
     public PlayerInput PlayerInput { get; private set; }
     public Vector2 MovementInput { get; private set; }
-    public Vector2 LookInput { get; private set; }
+    public Vector2 MouseInput { get; private set; }
     public bool AimInput { get; private set; }
     public bool ShootInput { get; private set; }
     public bool RunInput { get; private set; }
@@ -32,7 +32,7 @@ public class PlayerInputService : MonoBehaviour, PlayerInput.IPlayerMotionMapAct
         PlayerInput.PlayerMotionMap.RemoveCallbacks(this);
     }
     public void OnMovement(InputAction.CallbackContext context) => MovementInput = context.ReadValue<Vector2>();
-    public void OnMouseLook(InputAction.CallbackContext context) { }
+    public void OnMouseLook(InputAction.CallbackContext context) => MouseInput = context.ReadValue<Vector2>();
     public void OnAim(InputAction.CallbackContext context) => AimInput = context.performed;
     public void OnShoot(InputAction.CallbackContext context) => ShootInput = context.performed;
     public void OnRun(InputAction.CallbackContext context) => RunInput = context.performed;

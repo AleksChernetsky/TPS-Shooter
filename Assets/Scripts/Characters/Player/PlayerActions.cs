@@ -44,19 +44,22 @@ public class PlayerActions : MonoBehaviour
     {
         Movement(_playerinput.MovementInput, _playerinput.RunInput, _playerinput.CrouchInput);
         SetBodyMotionType(_playerinput.AimInput, _playerinput.ShootInput);
-        Aim(_playerinput.AimInput, _playerinput.RunInput);
-        Shoot(_playerinput.ShootInput, _playerinput.AimInput);
+        if (IsArmed)
+        {
+            Aim(_playerinput.AimInput, _playerinput.RunInput);
+            Shoot(_playerinput.ShootInput, _playerinput.AimInput);
+        }
     }
 
     private void Movement(Vector3 inputDirection, bool runInput, bool crouchInput)
     {
         // set move direction
-        _lookDirection = new Vector3(_tpsCamera.AimPoint.position.x, _body.position.y, _tpsCamera.AimPoint.position.z) - transform.position;
+        _lookDirection = _tpsCamera.CameraLookDirection(_body);
         _orientation.forward = _lookDirection.normalized;
         _moveDirection = _orientation.right * inputDirection.x + _orientation.forward * inputDirection.y;
         // move
         float moveSpeed = runInput ? _runSpeed : _walkSpeed;
-        _controller.Move(_moveDirection * moveSpeed * Time.deltaTime);
+        _controller.SimpleMove(_moveDirection * moveSpeed);
         // anim
         _animationService.MovementAnim(inputDirection, runInput, crouchInput, IsArmed);
     }
@@ -73,15 +76,12 @@ public class PlayerActions : MonoBehaviour
     private void Aim(bool aimInput, bool runInput)
     {
         // set camera
-        _tpsCamera.CameraSence(aimInput && IsArmed);
-        _tpsCamera.CombatCamera.SetActive(aimInput && !runInput && IsArmed);
+        _tpsCamera.SetCamera(aimInput);
         // set animations
-        _animationService.PlayAimAnim(aimInput && !runInput && IsArmed);
+        _animationService.PlayAimAnim(aimInput && !runInput);
     }
     private void Shoot(bool shootInput, bool aimInput)
     {
-        if (!IsArmed) return;
-
         if (shootInput)
             _weapon.PerformAttack(aimInput);
 

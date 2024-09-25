@@ -15,6 +15,7 @@ public class Weapon : MonoBehaviour
     [Header("Objects")]
     [SerializeField] private Transform _muzzle;
     [SerializeField] private ParticleSystem _muzzleFlash;
+    [field: SerializeField] public Transform WeaponCamera { get; private set; }
     [field: SerializeField] public Transform LeftHandPlace { get; private set; }
 
     [Header("Sounds")]
@@ -33,37 +34,34 @@ public class Weapon : MonoBehaviour
     {
         _timer += Time.deltaTime;
     }
-    public void PerformAttack(bool aimed)
-    {
-        if (_timer >= _attackSpeed)
-        {
-            OnShoot?.Invoke();
-            _muzzle.Rotate(Spread(aimed));
-
-            _muzzleFlash.Play();
-
-            SpawnProjectile();
-            _audioSource.PlayOneShot(_shotSounds[UnityEngine.Random.Range(0, _shotSounds.Length)]);
-
-            _timer = 0;
-        }
-    }
-    private void SpawnProjectile()
+    private void SpawnProjectile(Vector3 spread)
     {
         GameObject bullet = ProjectilePool.instance.GetProjectile();
         bullet.transform.SetPositionAndRotation(_muzzle.position, _muzzle.rotation);
         bullet.SetActive(true);
         bullet.TryGetComponent(out Projectile projectile);
         projectile.Damage = _damage;
-        projectile.RigidBody.AddForce(_muzzle.forward * projectile.Speed, ForceMode.Impulse);
+        projectile.RigidBody.AddForce(spread * projectile.Speed, ForceMode.Impulse);
     }
     private Vector3 Spread(bool aimed)
     {
-        return new Vector3
+        float spreadX = aimed ? UnityEngine.Random.Range(-_spreadAimed, _spreadAimed) : UnityEngine.Random.Range(-_spreadDefault, _spreadDefault);
+        float spreadY = aimed ? UnityEngine.Random.Range(-_spreadAimed, _spreadAimed) : UnityEngine.Random.Range(-_spreadDefault, _spreadDefault);
+
+        Quaternion spreadRotation = Quaternion.Euler(spreadX, spreadY, 0);
+        return spreadRotation * _muzzle.forward;
+    }
+    public void PerformAttack(bool aimed)
+    {
+        if (_timer >= _attackSpeed)
         {
-            x = aimed ? UnityEngine.Random.Range(-_spreadAimed, _spreadAimed) : UnityEngine.Random.Range(-_spreadDefault, _spreadDefault),
-            y = aimed ? UnityEngine.Random.Range(-_spreadAimed, _spreadAimed) : UnityEngine.Random.Range(-_spreadDefault, _spreadDefault),
-            z = aimed ? UnityEngine.Random.Range(-_spreadAimed, _spreadAimed) : UnityEngine.Random.Range(-_spreadDefault, _spreadDefault)
-        };
+            OnShoot?.Invoke();
+            _muzzleFlash.Play();
+
+            SpawnProjectile(Spread(aimed));
+            _audioSource.PlayOneShot(_shotSounds[UnityEngine.Random.Range(0, _shotSounds.Length)]);
+
+            _timer = 0;
+        }
     }
 }
