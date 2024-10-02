@@ -2,12 +2,12 @@ using System;
 
 using UnityEngine;
 
-public class Weapon : MonoBehaviour, IWeaponInterractable
+public class Weapon : MonoBehaviour, IWeaponInteractable
 {
     [Header("Basic Weapon values")]
     [SerializeField] private int _damage;
     [Tooltip("Lower = Faster")][SerializeField] private float _attackSpeed;
-    private float _timer => _timer + Time.deltaTime;
+    private float _timer;
 
     [Header("Spread values")]
     [SerializeField] private float _spreadAimed;
@@ -29,6 +29,10 @@ public class Weapon : MonoBehaviour, IWeaponInterractable
     private void Start()
     {
         _audioSource = GetComponent<AudioSource>();
+    }
+    private void Update()
+    {
+        _timer += Time.deltaTime;
     }
     private void SpawnProjectile(Vector3 spread)
     {
@@ -57,11 +61,11 @@ public class Weapon : MonoBehaviour, IWeaponInterractable
             SpawnProjectile(Spread(aimed));
             _audioSource.PlayOneShot(_shotSounds[UnityEngine.Random.Range(0, _shotSounds.Length)]);
 
-            //_timer = 0;
+            _timer = 0;
         }
     }
 
-    public Weapon WeaponInterract()
+    public Weapon WeaponInteract()
     {
         return this;
     }

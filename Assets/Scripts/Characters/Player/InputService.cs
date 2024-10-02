@@ -3,23 +3,23 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputService : MonoBehaviour, PlayerInput.IPlayerMotionMapActions
+public class InputService : PlayerInput.IPlayerMotionMapActions
 {
     public PlayerInput PlayerInput { get; private set; }
     public Vector2 MovementInput { get; private set; }
     public Vector2 MouseInput { get; private set; }
-    public bool AimInput { get; private set; }
-    public bool ShootInput { get; private set; }
     public bool RunInput { get; private set; }
     public bool CrouchInput { get; private set; }
     public int WeaponIndex { get; private set; }
 
+    public event Action<bool> OnAimInput;
+    public event Action<bool> OnShootInput;
     public event Action OnInteractInput;
     public event Action OnJumpInput;
-    public event Action OnHideWeaponInput; 
+    public event Action OnHideWeaponInput;
     public event Action<int> OnChooseWeapon;
 
-    private void OnEnable()
+    public void Initialize()
     {
         PlayerInput = new PlayerInput();
         PlayerInput.Enable();
@@ -27,7 +27,7 @@ public class InputService : MonoBehaviour, PlayerInput.IPlayerMotionMapActions
         PlayerInput.PlayerMotionMap.Enable();
         PlayerInput.PlayerMotionMap.SetCallbacks(this);
     }
-    private void OnDisable()
+    public void OnDisable()
     {
         PlayerInput.PlayerMotionMap.Disable();
         PlayerInput.PlayerMotionMap.RemoveCallbacks(this);
@@ -35,8 +35,22 @@ public class InputService : MonoBehaviour, PlayerInput.IPlayerMotionMapActions
 
     public void OnMovement(InputAction.CallbackContext context) => MovementInput = context.ReadValue<Vector2>();
     public void OnMouseLook(InputAction.CallbackContext context) => MouseInput = context.ReadValue<Vector2>();
-    public void OnAim(InputAction.CallbackContext context) => AimInput = context.performed;
-    public void OnShoot(InputAction.CallbackContext context) => ShootInput = context.performed;
+    public void OnAim(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            OnAimInput?.Invoke(true);
+        if (context.canceled)
+            OnAimInput?.Invoke(false);
+    }
+
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        if (context.started)
+            OnShootInput?.Invoke(true);
+        if (context.canceled)
+            OnShootInput?.Invoke(false);
+    }
+
     public void OnRun(InputAction.CallbackContext context) => RunInput = context.performed;
     public void OnCrouch(InputAction.CallbackContext context) => CrouchInput = context.performed;
     public void OnJump(InputAction.CallbackContext context)
@@ -64,5 +78,4 @@ public class InputService : MonoBehaviour, PlayerInput.IPlayerMotionMapActions
         if (context.started)
             OnChooseWeapon?.Invoke(WeaponIndex = 1);
     }
-
 }

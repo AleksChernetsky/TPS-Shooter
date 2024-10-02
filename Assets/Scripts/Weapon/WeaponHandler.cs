@@ -4,19 +4,43 @@ using UnityEngine;
 
 public class WeaponHandler
 {
+    private List<Weapon> _weapons = new List<Weapon>();
     private Transform _weaponPlace;
     private IKController _ikController;
-    private List<Weapon> _weapons = new List<Weapon>();
+    private InputService _inputService;
 
     public Weapon CurrentWeapon { get; private set; }
     public bool IsArmed { get; private set; }
+    public bool IsAiming { get; private set; }
+    public bool IsShooting { get; private set; }
 
-    public WeaponHandler(Transform weaponPlace, IKController ikController)
+    public WeaponHandler(Transform weaponPlace, IKController ikController, InputService inputService)
     {
         _weaponPlace = weaponPlace;
         _ikController = ikController;
+        _inputService = inputService;
+    }
+    public void Initialize()
+    {
+        _inputService.OnAimInput += Aim;
+        _inputService.OnShootInput += Shoot;
+    }
+    public void Aim(bool aimInput)
+    {
+        if (!IsArmed)
+            return;
+
+        IsAiming = aimInput;
     }
 
+    public void Shoot(bool shootInput)
+    {
+        if (!IsArmed)
+            return;
+
+        IsShooting = shootInput;
+        CurrentWeapon.PerformAttack(shootInput);
+    }
     public void EquipNewWeapon(Weapon weapon)
     {
         _weapons.Add(weapon);

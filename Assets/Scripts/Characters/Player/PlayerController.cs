@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(InputService), typeof(Rigidbody))]
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("References")]
@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement")]
     private Movement _movement;
-    bool IsGrounded => _movement.IsGrounded;
 
     [Header("Combat")]
     [SerializeField] private Transform _weaponHolder;
@@ -26,28 +25,36 @@ public class PlayerController : MonoBehaviour
     private Animator _animator;
     private AnimationHandler _animHandler;
 
-    private void Start()
+    private void Awake()
     {
-        _inputService = GetComponent<InputService>();
         _rigidBody = GetComponent<Rigidbody>();
         _ikController = GetComponentInChildren<IKController>();
         _animator = GetComponentInChildren<Animator>();
 
+        _inputService = new InputService();
         _movement = new Movement(_body, _orientation, _mainCamera, _rigidBody);
-        _animHandler = new AnimationHandler(_animator);
-        _weaponHandler = new WeaponHandler(_weaponHolder, _ikController);
-
+        _weaponHandler = new WeaponHandler(_weaponHolder, _ikController, _inputService);
+        _animHandler = new AnimationHandler(_animator, _inputService, _weaponHandler);
+    }
+    private void OnEnable()
+    {
+        _inputService.Initialize();
         _animHandler.Initialize();
-
-        _inputService.OnInteractInput += Interract;
+        _weaponHandler.Initialize();
+    }
+    private void Start()
+    {
+        _inputService.OnInteractInput += Interact;
         _inputService.OnChooseWeapon += ChooseWeapon;
     }
-
+    private void OnDisable()
+    {
+        _inputService.OnDisable();
+    }
     private void Update()
     {
         // animations
-        _animHandler.MovementAnim(MovementInput);
-        _animHandler.SetMotionType(MovementInput, _weaponHandler.IsArmed, RunInput, IsGrounded);
+        _animHandler.UpdateAnimations();
     }
     private void FixedUpdate()
     {
@@ -58,12 +65,12 @@ public class PlayerController : MonoBehaviour
     {
         _weaponHandler.TakeWeapon(weaponIndex);
     }
-    private void Interract()
+    private void Interact()
     {
-        if (_mainCamera.RaycastHit.collider.TryGetComponent(out IWeaponInterractable interractable))
+        if (_mainCamera.RaycastHit.collider.TryGetComponent(out IWeaponInteractable interactable))
         {
             if (_mainCamera.RaycastHit.distance <= 5f)
-                _weaponHandler.EquipNewWeapon(interractable.WeaponInterract());           
+                _weaponHandler.EquipNewWeapon(interactable.WeaponInteract());
         }
     }
 }

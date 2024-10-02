@@ -6,25 +6,38 @@ public class AnimationHandler
     private Vector3 _lerpedInput = Vector3.zero;
     private float _velocityLerp = 10f;
 
-    [Header("Jump")]
-    private readonly string _jumpAnim = "Jump";
-    private readonly string _jumpLayer = "JumpLayer";
-    private int _jumpLayerIndex;
+    [Header("Aim")]
+    private readonly string _aimLayer = "AimLayer";
+    private int _aimLayerIndex;
+
+    [Header("Shoot")]
+    private readonly string _shootLayer = "ShootLayer";
+    private int _shootLayerIndex;
 
     private Animator _animator;
+    private InputService _inputService;
+    private WeaponHandler _weaponHandler;
     private float _transitionSpeed = 15f;
 
-    public AnimationHandler(Animator animator)
+    public AnimationHandler(Animator animator, InputService inputService, WeaponHandler weaponHandler)
     {
         _animator = animator;
+        _inputService = inputService;
+        _weaponHandler = weaponHandler;
     }
 
     public void Initialize()
     {
-        _jumpLayerIndex = _animator.GetLayerIndex(_jumpLayer);
+        _aimLayerIndex = _animator.GetLayerIndex(_aimLayer);
+        _shootLayerIndex = _animator.GetLayerIndex(_shootLayer);
     }
-
-    public void MovementAnim(Vector2 movementInput)
+    public void UpdateAnimations()
+    {
+        MovementAnim(_inputService.MovementInput);
+        SetMotionType(_inputService.MovementInput, _weaponHandler.IsArmed, _inputService.RunInput);
+        CombatState(_weaponHandler.IsAiming, _weaponHandler.IsShooting);
+    }
+    private void MovementAnim(Vector2 movementInput)
     {
         _lerpedInput = movementInput == Vector2.zero && _lerpedInput.magnitude < 0.1f
             ? Vector2.zero
@@ -32,23 +45,17 @@ public class AnimationHandler
 
         _animator.SetFloat("Velocity", _lerpedInput.magnitude);
     }
-    
-    public void SetMotionType(Vector2 movementInput, bool isArmed, bool runInput, bool isGrounded)
+    private void SetMotionType(Vector2 movementInput, bool isArmed, bool runInput)
     {
         // armed
         _animator.SetBool("Armed", isArmed);
         // run
         RunState(movementInput, runInput);
-        // jump
-        JumpState(isGrounded);
     }
-    private void SetLayerWeight(bool condition, int layerIndex, float transitionSpeed)
+    private void CombatState(bool isAiming, bool isShooting)
     {
-        float layerWeight = condition
-                ? Mathf.Lerp(_animator.GetLayerWeight(layerIndex), 1f, transitionSpeed * Time.deltaTime)
-                : Mathf.Lerp(_animator.GetLayerWeight(layerIndex), 0f, transitionSpeed * Time.deltaTime);
-
-        _animator.SetLayerWeight(layerIndex, layerWeight);
+        SetLayerWeight(isAiming, _aimLayerIndex);
+        SetLayerWeight(isShooting, _shootLayerIndex);
     }
     private void RunState(Vector2 inputValues, bool runInput)
     {
@@ -57,9 +64,12 @@ public class AnimationHandler
         else
             _animator.SetBool("Run", false);
     }
-    private void JumpState(bool isGrounded)
+    private void SetLayerWeight(bool condition, int layerIndex)
     {
-        _animator.SetBool(_jumpAnim, !isGrounded);
-        SetLayerWeight(!isGrounded, _jumpLayerIndex, _transitionSpeed);
+        float layerWeight = condition
+                ? Mathf.Lerp(_animator.GetLayerWeight(layerIndex), 1f, _transitionSpeed * Time.deltaTime)
+                : Mathf.Lerp(_animator.GetLayerWeight(layerIndex), 0f, _transitionSpeed * Time.deltaTime);
+
+        _animator.SetLayerWeight(layerIndex, layerWeight);
     }
 }
