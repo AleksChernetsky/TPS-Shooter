@@ -3,26 +3,29 @@
 public class AnimationHandler
 {
     [Header("Movement")]
-    private Vector3 _lerpedInput = Vector3.zero;
+    private Vector2 _lerpedInput = Vector2.zero;
     private float _velocityLerp = 10f;
+
+    [Header("ArmedLayer")]
+    private readonly string _aimedMovementLayer = "AimedMovementLayer";
+    private int _aimedMovementLayerIndex;
 
     [Header("Aim")]
     private readonly string _aimLayer = "AimLayer";
     private int _aimLayerIndex;
 
     [Header("Shoot")]
+    private readonly string _shootAnim = "Shoot";
     private readonly string _shootLayer = "ShootLayer";
     private int _shootLayerIndex;
 
     private Animator _animator;
-    private InputService _inputService;
     private WeaponHandler _weaponHandler;
     private float _transitionSpeed = 15f;
 
-    public AnimationHandler(Animator animator, InputService inputService, WeaponHandler weaponHandler)
+    public AnimationHandler(Animator animator, WeaponHandler weaponHandler)
     {
         _animator = animator;
-        _inputService = inputService;
         _weaponHandler = weaponHandler;
     }
 
@@ -30,12 +33,15 @@ public class AnimationHandler
     {
         _aimLayerIndex = _animator.GetLayerIndex(_aimLayer);
         _shootLayerIndex = _animator.GetLayerIndex(_shootLayer);
+        _aimedMovementLayerIndex = _animator.GetLayerIndex(_aimedMovementLayer);
+
+        _weaponHandler.OnShootAction += PlayShootAnim;
     }
-    public void UpdateAnimations()
+    public void UpdateAnimations(Vector2 movementInput, bool runInput)
     {
-        MovementAnim(_inputService.MovementInput);
-        SetMotionType(_inputService.MovementInput, _weaponHandler.IsArmed, _inputService.RunInput);
-        CombatState(_weaponHandler.IsAiming, _weaponHandler.IsShooting);
+        MovementAnim(movementInput);
+        SetMotionType(movementInput, runInput);
+        CombatState(runInput);
     }
     private void MovementAnim(Vector2 movementInput)
     {
@@ -44,27 +50,31 @@ public class AnimationHandler
             : Vector3.Lerp(_lerpedInput, movementInput, _velocityLerp * Time.deltaTime);
 
         _animator.SetFloat("Velocity", _lerpedInput.magnitude);
+        _animator.SetFloat("InputX", _lerpedInput.x);
+        _animator.SetFloat("InputY", _lerpedInput.y);
     }
-    private void SetMotionType(Vector2 movementInput, bool isArmed, bool runInput)
+    private void SetMotionType(Vector2 movementInput, bool runInput)
     {
         // armed
-        _animator.SetBool("Armed", isArmed);
+        _animator.SetBool("Armed", _weaponHandler.IsArmed);
         // run
         RunState(movementInput, runInput);
     }
-    private void CombatState(bool isAiming, bool isShooting)
+    private void PlayShootAnim() => _animator.SetTrigger(_shootAnim);
+    private void CombatState(bool runInput)
     {
-        SetLayerWeight(isAiming, _aimLayerIndex);
-        SetLayerWeight(isShooting, _shootLayerIndex);
+        SetLayerWeight(_aimedMovementLayerIndex, _weaponHandler.IsAiming || _weaponHandler.IsShooting);
+        SetLayerWeight(_aimLayerIndex, !runInput && _weaponHandler.IsAiming);
+        SetLayerWeight(_shootLayerIndex, _weaponHandler.IsShooting);
     }
-    private void RunState(Vector2 inputValues, bool runInput)
+    private void RunState(Vector2 movementInput, bool runInput)
     {
-        if (inputValues != Vector2.zero)
+        if (movementInput != Vector2.zero)
             _animator.SetBool("Run", runInput);
         else
             _animator.SetBool("Run", false);
     }
-    private void SetLayerWeight(bool condition, int layerIndex)
+    private void SetLayerWeight(int layerIndex, bool condition)
     {
         float layerWeight = condition
                 ? Mathf.Lerp(_animator.GetLayerWeight(layerIndex), 1f, _transitionSpeed * Time.deltaTime)

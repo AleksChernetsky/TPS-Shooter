@@ -3,9 +3,10 @@ using UnityEngine.AI;
 
 public class EnemyTracker : MonoBehaviour
 {
+    [SerializeField] private Transform _lookAtPoint;
     private float _checkCollidersDelay;
-    private float DistanceToTarget;
-    private Collider[] enemyColliders;
+    private float _distanceToTarget;
+    private Collider[] _enemyColliders;
 
     [Header("Enemy Check Values")]
     [SerializeField] private LayerMask layermask;
@@ -39,7 +40,7 @@ public class EnemyTracker : MonoBehaviour
         _checkCollidersDelay += Time.deltaTime;
         if (_checkCollidersDelay >= 0.25f)
         {
-            enemyColliders = Physics.OverlapSphere(transform.position, DistanceToCheck, layermask);
+            _enemyColliders = Physics.OverlapSphere(transform.position, DistanceToCheck, layermask);
             EnemySight();
             Enemy = NearestTarget();
             _checkCollidersDelay = 0;
@@ -50,17 +51,17 @@ public class EnemyTracker : MonoBehaviour
         DistanceToEnemy = Mathf.Infinity;
         Transform target = null;
 
-        for (var i = 0; i < enemyColliders.Length; i++)
+        for (var i = 0; i < _enemyColliders.Length; i++)
         {
-            if (enemyColliders[i].transform == transform)
+            if (_enemyColliders[i].transform == transform)
                 continue;
 
-            DistanceToTarget = Vector3.Distance(transform.position, enemyColliders[i].transform.position);
+            _distanceToTarget = Vector3.Distance(transform.position, _enemyColliders[i].transform.position);
 
-            if (DistanceToTarget < DistanceToEnemy)
+            if (_distanceToTarget < DistanceToEnemy)
             {
-                DistanceToEnemy = DistanceToTarget;
-                target = enemyColliders[i].transform;
+                DistanceToEnemy = _distanceToTarget;
+                target = _enemyColliders[i].transform;
             }
         }
         return target;
@@ -76,5 +77,13 @@ public class EnemyTracker : MonoBehaviour
             if (EnemyBlocked)
                 Debug.DrawRay(hit.position, Vector3.up, Color.yellow, 0.5f);
         }
+    }
+    public void FaceToEnemy()
+    {
+        transform.LookAt(Enemy);
+        _lookAtPoint.position = Vector3.Slerp
+            (_lookAtPoint.position,
+            new Vector3(Enemy.position.x + Random.Range(-1f, 1f), Enemy.position.y + Random.Range(0f, 2f), Enemy.position.z),
+            5f * Time.deltaTime);
     }
 }

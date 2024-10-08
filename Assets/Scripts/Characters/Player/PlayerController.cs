@@ -21,55 +21,69 @@ public class PlayerController : MonoBehaviour
     private WeaponHandler _weaponHandler;
 
     private Rigidbody _rigidBody;
-    private IKController _ikController;
+    private RigController _rigController;
     private Animator _animator;
     private AnimationHandler _animHandler;
 
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
-        _ikController = GetComponentInChildren<IKController>();
+        _rigController = GetComponentInChildren<RigController>();
         _animator = GetComponentInChildren<Animator>();
 
         _inputService = new InputService();
+        _weaponHandler = new WeaponHandler(_weaponHolder, _rigController);
         _movement = new Movement(_body, _orientation, _mainCamera, _rigidBody);
-        _weaponHandler = new WeaponHandler(_weaponHolder, _ikController, _inputService);
-        _animHandler = new AnimationHandler(_animator, _inputService, _weaponHandler);
+        _animHandler = new AnimationHandler(_animator, _weaponHandler);
     }
     private void OnEnable()
     {
         _inputService.Initialize();
         _animHandler.Initialize();
+        _rigController.Initialize();
         _weaponHandler.Initialize();
-    }
-    private void Start()
-    {
+
+        _inputService.OnShootInput += Shoot;
+        _inputService.OnAimInput += Aim;
+        _inputService.OnHideWeaponInput += HideWeapon;
         _inputService.OnInteractInput += Interact;
         _inputService.OnChooseWeapon += ChooseWeapon;
-    }
-    private void OnDisable()
-    {
-        _inputService.OnDisable();
     }
     private void Update()
     {
         // animations
-        _animHandler.UpdateAnimations();
+        _animHandler.UpdateAnimations(MovementInput, RunInput);
+        // rigs
+        _rigController.SetAimRig(_weaponHandler.IsAiming || _weaponHandler.IsShooting);
     }
     private void FixedUpdate()
     {
         // movement
-        _movement.Move(MovementInput, RunInput);
+        _movement.UpdateMovement(MovementInput, RunInput, _weaponHandler);
     }
-    private void ChooseWeapon(int weaponIndex)
+    private void LateUpdate()
     {
-        _weaponHandler.TakeWeapon(weaponIndex);
+        // camera
+        _mainCamera.SetCombatCamera(!RunInput && _weaponHandler.IsArmed && _weaponHandler.IsAiming);
     }
+    private void OnDisable()
+    {
+        _inputService.OnShootInput -= Shoot;
+        _inputService.OnAimInput -= Aim;
+        _inputService.OnHideWeaponInput -= HideWeapon;
+        _inputService.OnInteractInput -= Interact;
+        _inputService.OnChooseWeapon -= ChooseWeapon;
+        _inputService.OnDisable();
+    }
+    private void Shoot(bool shootInput) => _weaponHandler.Shoot(shootInput);
+    private void Aim(bool aimInput) => _weaponHandler.Aim(RunInput, aimInput);
+    private void HideWeapon() => _weaponHandler.HideWeapon();
+    private void ChooseWeapon(int weaponIndex) => _weaponHandler.TakeWeapon(weaponIndex);
     private void Interact()
     {
         if (_mainCamera.RaycastHit.collider.TryGetComponent(out IWeaponInteractable interactable))
         {
-            if (_mainCamera.RaycastHit.distance <= 5f)
+            if (_mainCamera.RaycastHit.distance <= 4f)
                 _weaponHandler.EquipNewWeapon(interactable.WeaponInteract());
         }
     }
