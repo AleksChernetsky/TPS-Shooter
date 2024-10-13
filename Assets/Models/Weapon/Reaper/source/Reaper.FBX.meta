@@ -3,7 +3,67 @@ guid: 186ada1ebf1092741bb7e545e20a8890
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BulletBallistic
+    second: {fileID: 2100000, guid: e5c35e1e8bb8c7d4cab1e2e7407ed212, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BulletRailGun
+    second: {fileID: 2100000, guid: 6b8942e6ab44bce4590e3ae0293d0361, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Collimator
+    second: {fileID: 2100000, guid: b3feaee75faba3a478d8841176a6c6b2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glass
+    second: {fileID: 2100000, guid: f79b9002db2f19b42a9dca2a9e84cabb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: IronSight
+    second: {fileID: 2100000, guid: 0283295080a53ea49b83953d42dec1b9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: IronSightGlow
+    second: {fileID: 2100000, guid: 21b06c34969756e49b52b8a846bc0bff, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Limbs
+    second: {fileID: 2100000, guid: becc715eade14c14483acacbdee7aafb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RailGun
+    second: {fileID: 2100000, guid: 0c6e750331adebe4b9bae371cd9ba4e6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Receiver1
+    second: {fileID: 2100000, guid: 6898f44b12c058c4db830822570ba04c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Receiver2
+    second: {fileID: 2100000, guid: 5268eb16db173fb4caa22fded6012557, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Suppressor
+    second: {fileID: 2100000, guid: 31b03f303e350ff47a1186209dea6ada, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: VATS
+    second: {fileID: 2100000, guid: f12a1dd2c8c0b224dbf5624190c097b7, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

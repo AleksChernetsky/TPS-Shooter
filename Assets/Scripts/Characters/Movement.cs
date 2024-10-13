@@ -41,8 +41,8 @@ public class Movement
     {
         bool canShoot = (aimInput || shootInput) && isArmed;
         _body.forward = canShoot
-            ? Vector3.Slerp(_body.forward, _lookDirection.normalized, _lerpBodyRotation * Time.deltaTime)
-            : Vector3.Slerp(_body.forward, _moveDirection.normalized, _lerpBodyRotation * Time.deltaTime);
+                ? Vector3.Slerp(_body.forward, _lookDirection.normalized, _lerpBodyRotation * Time.deltaTime)
+                : Vector3.Slerp(_body.forward, _moveDirection.normalized, _lerpBodyRotation * Time.deltaTime);
     }
 
     #region Body Rotation

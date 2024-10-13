@@ -7,6 +7,12 @@ public class StateChase : BaseState, IState
     public override AIState State => AIState.Chase;
     public override void UpdateState()
     {
+        if (_aiSharedContext.VitalitySystem.CurrentHealth <= 0)
+        {
+            _stateSwitcher.SwitchTo(AIState.Death);
+            return;
+        }
+
         if (_aiSharedContext.EnemyTracker.Enemy != null)
         _aiSharedContext.NavMeshAgent.SetDestination(_aiSharedContext.EnemyTracker.Enemy.position);
 

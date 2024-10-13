@@ -17,7 +17,7 @@ public class VitalitySystem : MonoBehaviour
     public void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
-
+        Debug.Log(CurrentHealth);
         if (CurrentHealth <= 0)
         {
             OnDie?.Invoke();

@@ -11,25 +11,27 @@ public class BotController : MonoBehaviour
     [SerializeField] private Transform _weaponHolder;
     private WeaponHandler _weaponHandler;
 
-    private NavMeshAgent _agent;
-    private RigController _rigController;
-    private Animator _animator;
-    private AnimationHandler _animHandler;
-    private EnemyTracker _enemyTracker;
-
     [Header("StateMachine")]
     private State _state;
+
+    private NavMeshAgent _agent;
+    private EnemyTracker _enemyTracker;
+    private VitalitySystem _vitalitySystem;
+    private AnimationHandler _animHandler;
+    private Animator _animator;
+    private RigController _rigController;
 
     private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
         _enemyTracker = GetComponent<EnemyTracker>();
-        _rigController = GetComponentInChildren<RigController>();
+        _vitalitySystem = GetComponent<VitalitySystem>();
         _animator = GetComponentInChildren<Animator>();
+        _rigController = GetComponentInChildren<RigController>();
 
         _weaponHandler = new WeaponHandler(_weaponHolder, _rigController);
         _animHandler = new AnimationHandler(_animator, _weaponHandler);
-        _state = new State(_weaponHandler, _enemyTracker, _agent);
+        _state = new State(_weaponHandler, _enemyTracker, _agent, _vitalitySystem);
     }
     private void OnEnable()
     {

@@ -4,6 +4,13 @@
     public override AIState State => AIState.Attack;
     public override void UpdateState()
     {
+        if (_aiSharedContext.VitalitySystem.CurrentHealth <= 0)
+        {
+            _aiSharedContext.WeaponHandler.Shoot(false);
+            _stateSwitcher.SwitchTo(AIState.Death);
+            return;
+        }
+
         if (_aiSharedContext.EnemyTracker.Enemy != null)
         {
             _aiSharedContext.NavMeshAgent.isStopped = true;

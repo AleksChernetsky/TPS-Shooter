@@ -7,7 +7,11 @@ public class StateSearch : BaseState, IState
     public override AIState State => AIState.Search;
     public override void UpdateState()
     {
-        Debug.Log("State Search");
+        if (_aiSharedContext.VitalitySystem.CurrentHealth <= 0)
+        {
+            _stateSwitcher.SwitchTo(AIState.Death);
+            return;
+        }
 
         if (_aiSharedContext.EnemyTracker.DistanceToEnemy <= _aiSharedContext.EnemyTracker.DistanceToCheck)
             _stateSwitcher.SwitchTo(AIState.Chase);

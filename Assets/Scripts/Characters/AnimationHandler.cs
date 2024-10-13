@@ -19,9 +19,10 @@ public class AnimationHandler
     private readonly string _shootLayer = "ShootLayer";
     private int _shootLayerIndex;
 
+    private float _transitionSpeed = 15f;
+
     private Animator _animator;
     private WeaponHandler _weaponHandler;
-    private float _transitionSpeed = 15f;
 
     public AnimationHandler(Animator animator, WeaponHandler weaponHandler)
     {
@@ -41,7 +42,7 @@ public class AnimationHandler
     {
         MovementAnim(movementInput);
         SetMotionType(movementInput, runInput);
-        CombatState(runInput);
+        SetCurrentLayer(runInput);
     }
     private void MovementAnim(Vector2 movementInput)
     {
@@ -61,7 +62,7 @@ public class AnimationHandler
         RunState(movementInput, runInput);
     }
     private void PlayShootAnim() => _animator.SetTrigger(_shootAnim);
-    private void CombatState(bool runInput)
+    private void SetCurrentLayer(bool runInput)
     {
         SetLayerWeight(_aimedMovementLayerIndex, _weaponHandler.IsAiming || _weaponHandler.IsShooting);
         SetLayerWeight(_aimLayerIndex, !runInput && _weaponHandler.IsAiming);

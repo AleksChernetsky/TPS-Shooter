@@ -10,6 +10,9 @@ public class Weapon : MonoBehaviour, IWeaponInteractable
     [SerializeField] private int _projectileSpeed;
     [SerializeField] private float _attackDelay;
     private RaycastHit _hitInfo;
+    [field: SerializeField] public int SightMagnification { get; private set; }
+    [field: SerializeField] public Transform CameraPlace { get; private set; }
+    [field: SerializeField] public Transform LeftHandTarget { get; private set; }
 
     [Header("Spread values")]
     [SerializeField] private float _spreadAimed;
@@ -27,7 +30,6 @@ public class Weapon : MonoBehaviour, IWeaponInteractable
 
     private Coroutine _coroutine;
 
-    [field: SerializeField] public Transform LeftHandTarget { get; private set; }
     public event Action OnShotEvent;
 
     private void Start()
