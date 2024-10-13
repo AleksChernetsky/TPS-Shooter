@@ -17,11 +17,10 @@ public class VitalitySystem : MonoBehaviour
     public void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
-        Debug.Log(CurrentHealth);
+
         if (CurrentHealth <= 0)
         {
             OnDie?.Invoke();
-            gameObject.GetComponent<Collider>().enabled = false;
             Destroy(gameObject, 3);
         }
         else

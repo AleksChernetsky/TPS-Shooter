@@ -181,7 +181,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.125, y: 0.125, z: 0.125}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4943364594355362629}
@@ -377,7 +377,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 0.5518868, g: 1, b: 0.89459443, a: 1}
+      maxColor: {r: 1, g: 0.9546318, b: 0.5529412, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -9985,7 +9985,7 @@ Transform:
   m_GameObject: {fileID: 6081847629300023049}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.4607, z: 4.9692}
+  m_LocalPosition: {x: 0, y: 0.46, z: 5.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -10046,10 +10046,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.13451375
-  m_Height: 0.85294557
+  m_Radius: 0.09993999
+  m_Height: 0.7962305
   m_Direction: 1
-  m_Center: {x: -0.02570115, y: 0.2384632, z: -0.019061148}
+  m_Center: {x: -0.06401816, y: 0.21010572, z: 0.024519578}
 --- !u!114 &5160657772912161740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10062,7 +10062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c660cd1a9837114899085db35530d80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _damage: 10
+  _damage: 20
   _projectileSpeed: 5
   _attackDelay: 0.15
   <SightMagnification>k__BackingField: 40

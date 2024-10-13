@@ -5,13 +5,14 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private Rigidbody _rigidbody;
-    private int _damage;
     private int _speed;
 
     private float _timeToDestroy = 0.5f;
     private float _timer;
 
-    private void FixedUpdate()
+    public int Damage { get; private set; }
+
+    private void Update()
     {
         _timer += Time.deltaTime;
 
@@ -23,10 +24,10 @@ public class Projectile : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         ContactPoint contact = collision.contacts[0];
-        if (collision.gameObject.TryGetComponent(out VitalitySystem vitalitySystem))
-        {
-            vitalitySystem.TakeDamage(_damage);
-        }
+        //if (collision.gameObject.TryGetComponent(out VitalitySystem vitalitySystem))
+        //{
+        //    vitalitySystem.TakeDamage(_damage);
+        //}
         PlayHitEffect(contact.point, Quaternion.LookRotation(contact.normal));
         ResetProjectile();
     }
@@ -34,7 +35,7 @@ public class Projectile : MonoBehaviour
     {
         transform.SetPositionAndRotation(position, rotation);
         gameObject.SetActive(true);
-        _damage = damage;
+        Damage = damage;
         _speed = speed;
         _rigidbody.AddForce((hitPosition - position) * _speed, ForceMode.Impulse);
     }

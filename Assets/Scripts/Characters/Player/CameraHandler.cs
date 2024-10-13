@@ -1,12 +1,14 @@
 ﻿using Unity.Cinemachine;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraHandler : MonoBehaviour
 {
     [SerializeField] private CinemachinePanTilt _normalCamera;
     [SerializeField] private CinemachinePanTilt _combatCamera;
     [SerializeField] private LayerMask _ignorLayer;
+    [SerializeField] private Image _aimPointImage;
     private RaycastHit _raycastHit;
     private Vector2 _screenCenter;
 
@@ -49,7 +51,9 @@ public class CameraHandler : MonoBehaviour
     }
     public void SetCameraMode(bool aimed)
     {
+        _aimPointImage.gameObject.SetActive(!aimed);
         _normalCamera.gameObject.SetActive(!aimed);
+
         _combatCamera.gameObject.SetActive(aimed);
     }
     public Vector3 CameraLookDirection(Transform body, bool condition)

@@ -12,20 +12,34 @@ public class RagdollHandler : MonoBehaviour
         _animator = GetComponent<Animator>();
         _vitalitySystem = GetComponentInParent<VitalitySystem>();
 
-        SetRagdollActive(false);
+        InitializeRagdoll();
 
         _vitalitySystem.OnDie += ActivateRagdoll;
     }
-
-    public void ActivateRagdoll()
+    private void InitializeRagdoll()
+    {
+        foreach (var part in _ragdolParts)
+        {
+            part.isKinematic = true;
+            part.gameObject.AddComponent<RagdollPart>().Initialize(_vitalitySystem);
+        }
+    }
+    private void ActivateRagdoll()
     {
         _animator.enabled = false;
-        SetRagdollActive(true);
+        foreach (var part in _ragdolParts)
+        {
+            part.isKinematic = false;
+        }
     }
-
-    void SetRagdollActive(bool active)
+}
+public class RagdollPart : MonoBehaviour
+{
+    private VitalitySystem _vitalitySystem;
+    public void Initialize(VitalitySystem vitalitySystem) => _vitalitySystem = vitalitySystem;
+    private void OnCollisionEnter(Collision collision)
     {
-        foreach (var rb in _ragdolParts)
-            rb.isKinematic = !active;
+        if (collision.gameObject.TryGetComponent(out Projectile projectile))
+            _vitalitySystem.TakeDamage(projectile.Damage);
     }
 }
